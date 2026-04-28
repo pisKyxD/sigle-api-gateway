@@ -31,6 +31,7 @@ public class FirebaseAuthFilter extends OncePerRequestFilter {
         }
 
         String authHeader = request.getHeader("Authorization");
+        System.out.println("=== AUTH HEADER: " + authHeader);
 
         if (authHeader == null || !authHeader.startsWith(BEARER_PREFIX)) {
             writeUnauthorized(response, "Token no proporcionado");
@@ -39,17 +40,20 @@ public class FirebaseAuthFilter extends OncePerRequestFilter {
 
         String token = authHeader
             .substring(BEARER_PREFIX.length()).trim();
+        System.out.println("=== TOKEN LENGTH: " + token.length());
 
         try {
             FirebaseToken decoded = FirebaseAuth
                 .getInstance()
                 .verifyIdToken(token);
 
+            System.out.println("=== TOKEN VALID, UID: " + decoded.getUid());
             request.setAttribute("uid", decoded.getUid());
             request.setAttribute("email", decoded.getEmail());
             filterChain.doFilter(request, response);
 
         } catch (Exception e) {
+            System.out.println("=== FIREBASE ERROR: " + e.getMessage());
             writeUnauthorized(response, "Token inválido o expirado");
         }
     }
