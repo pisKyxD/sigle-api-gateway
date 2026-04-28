@@ -33,3 +33,4 @@ build/
 .vscode/
 ### firebase ###
 firebase-service-account.json
+docker-compose.yml
