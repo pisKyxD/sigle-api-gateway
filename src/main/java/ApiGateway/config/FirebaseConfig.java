@@ -5,6 +5,8 @@ import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
 import org.springframework.context.annotation.Configuration;
 import jakarta.annotation.PostConstruct;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -13,9 +15,15 @@ public class FirebaseConfig {
 
     @PostConstruct
     public void initFirebase() throws IOException {
-        InputStream serviceAccount =
-            getClass().getClassLoader()
+        InputStream serviceAccount;
+
+        File externalFile = new File("/app/firebase-service-account.json");
+        if (externalFile.exists()) {
+            serviceAccount = new FileInputStream(externalFile);
+        } else {
+            serviceAccount = getClass().getClassLoader()
                 .getResourceAsStream("firebase-service-account.json");
+        }
 
         FirebaseOptions options = FirebaseOptions.builder()
             .setCredentials(
