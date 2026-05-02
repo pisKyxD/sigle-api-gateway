@@ -25,6 +25,15 @@ public class FirebaseAuthFilter extends OncePerRequestFilter {
 
         String path = request.getRequestURI();
 
+
+        if ("OPTIONS".equalsIgnoreCase(request.getMethod())) {
+            response.setHeader("Access-Control-Allow-Origin", "*");
+            response.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+            response.setHeader("Access-Control-Allow-Headers", "*");
+            response.setStatus(HttpServletResponse.SC_OK);
+            return;
+        }
+
         if (!path.startsWith("/api/")) {
             filterChain.doFilter(request, response);
             return;
@@ -39,13 +48,13 @@ public class FirebaseAuthFilter extends OncePerRequestFilter {
         }
 
         String token = authHeader
-            .substring(BEARER_PREFIX.length()).trim();
+                .substring(BEARER_PREFIX.length()).trim();
         System.out.println("=== TOKEN LENGTH: " + token.length());
 
         try {
             FirebaseToken decoded = FirebaseAuth
-                .getInstance()
-                .verifyIdToken(token);
+                    .getInstance()
+                    .verifyIdToken(token);
 
             System.out.println("=== TOKEN VALID, UID: " + decoded.getUid());
             request.setAttribute("uid", decoded.getUid());
@@ -64,7 +73,7 @@ public class FirebaseAuthFilter extends OncePerRequestFilter {
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.getWriter().write(
-            "{\"error\":\"unauthorized\",\"message\":\""
-            + message + "\"}");
+                "{\"error\":\"unauthorized\",\"message\":\""
+                        + message + "\"}");
     }
 }
